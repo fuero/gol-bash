@@ -20,16 +20,19 @@ function set_at() {
   # https://stackoverflow.com/questions/68167187/how-to-use-a-bash-variable-reference-to-an-associative-array-in-a-bash-function
   declare -Ag "${4:-BOARD}"
   local -n board_ref="${4:-BOARD}"
-  for ((i=-1;i<=1;i++))
+  for ((i=-1; i<=1; i++))
   do
-    for ((j=-1;j<=1;j++))
+    for ((j=-1; j<=1; j++))
     do
       local index=$((x+i)),$((y+j))
+      # Set the given cell
       if [[ ${i} -eq 0 && ${j} -eq 0 ]]
       then
         # shellcheck disable=SC2004
         board_ref[${index}]="${state}"
       fi
+      # If given a "1" to set, set all unset surrounding cells to "0" to
+      # allow resurrection
       if [[ ! -v board_ref[${index}] && "${state}" -eq 1 ]]
       then
         # shellcheck disable=SC2004
@@ -42,8 +45,9 @@ function set_at() {
 function get_at() {
   local x="${1:-0}" y="${2:-0}"
   declare -Ag "${3:-BOARD}"
-  local -n board_ref="${3:-BOARD}"
-  printf "%d" "${board_ref["${x},${y}"]:-0}"
+  # shellcheck disable=SC2178
+  local -n board="${3:-BOARD}"
+  printf "%d" "${board["${x},${y}"]:-0}"
 }
 
 function get_neighbours() {
@@ -71,6 +75,7 @@ function get_neighbours() {
 
 function tick() {
   declare -Ag BOARD
+  # shellcheck disable=SC2034
   declare -A NEXT_BOARD=()
   local -n board=BOARD
   for i in "${!board[@]}"
@@ -104,21 +109,13 @@ function get_length() {
   set -u
 }
 
-function clear_array() {
-  declare -Ag "${1}"
-  local -n it="${1}"
-  for i in "${!it[@]}"
-  do
-    unset "it[${i}]"
-  done
-}
-
 function copy_array() {
   declare -Ag "${1}"
   declare -Ag "${2}"
   local -n from="${1}" to="${2}"
   for i in "${!from[@]}"
   do
+    # shellcheck disable=SC2004,SC2034
     to[${i}]=${from[${i}]}
   done
 }
@@ -131,9 +128,9 @@ function dump_board() {
 function print_board() {
   local n="${1:-5}"
   local out=""
-  for ((i=-n;i<=n;i++))
+  for ((i=-n; i<=n; i++))
   do
-    for ((j=-n;j<=n;j++))
+    for ((j=-n; j<=n; j++))
     do
       if [[ $(get_at "${i}" "${j}" "${2:-BOARD}") -eq 1 ]]
       then

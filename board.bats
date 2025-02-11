@@ -45,3 +45,17 @@ teardown() {
   set_at 0 0
   assert [ $(get_neighbours 0 0) -eq 0 ]
 }
+
+@test "print board" {
+  set_at 0 0
+  set_at 0 1
+  run print_board 5
+  assert_output --partial ' xx '
+}
+
+@test "dump board" {
+  set_at 0 0
+  set_at 0 1
+  run dump_board BOARD
+  assert_output 'declare -A BOARD=([-1,-1]="0" [0,2]="0" [0,1]="1" [0,0]="1" [1,-1]="0" [1,2]="0" [1,0]="0" [1,1]="0" [-1,2]="0" [-1,1]="0" [-1,0]="0" [0,-1]="0" )'
+}

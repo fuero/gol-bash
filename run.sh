@@ -10,7 +10,7 @@ set_at 2 1
 while [[ "$(get_length)" -gt 0 ]]
 do
   print_board 5
-#  dump_board BOARD
+  dump_board BOARD
   tick
   #read -rp "Press Enter to continue" </dev/tty
 done

@@ -4,6 +4,7 @@ SHELL := bash
 .DELETE_ON_ERROR:
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
+.DEFAULT_GOAL = all
 
 .PHONY: help
 help: # see https://diamantidis.github.io/tips/2020/07/01/list-makefile-targets
@@ -11,8 +12,30 @@ help: # see https://diamantidis.github.io/tips/2020/07/01/list-makefile-targets
 	| sed -n 's/^\(.*\): \(.*\)##\(.*\)/\1|\3/p' \
 	| column -t  -s '|'
 
-test: *.bats
-	for i in $^ 
-	do
-		./$${i}
-	done
+.PHONY: clean
+clean:
+	$(RM) -rf coverage
+
+.PHONY: all
+all: lint test run
+
+.PHONY: run
+run: run.sh ## Runs sample game
+	./run.sh
+
+.PHONY: lint
+lint: Makefile *.sh ## Lint with shellcheck
+	shellcheck -o all -S style *.sh
+	checkmake Makefile
+
+.PHONY: test
+test: *.bats ## Runs all tests
+	bats --jobs $$(nproc) $^
+
+.PHONY: coverage
+coverage: *.bats ## Runs tests with coverage
+	kcov --bash-dont-parse-binary-dir --include-path=. coverage bats $^
+
+.PHONY: time
+time: ## Run sample multiple times and print timings
+	hyperfine ./run.sh
