@@ -84,8 +84,10 @@ function tick() {
     # x,y
     mapfile -td "," fields < <(printf "%s\0" "${i}")
     local x="${fields[0]}" y="${fields[1]}"
+    # shellcheck disable=SC2155
     local state="$(get_at "${x}" "${y}")"
     unset fields
+    # shellcheck disable=SC2046
     set_at "${x}" "${y}" "$(is_alive $(get_neighbours "${x}" "${y}") "${state}")" NEXT_BOARD
   done
   unset BOARD board

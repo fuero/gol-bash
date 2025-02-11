@@ -14,7 +14,7 @@ help: # see https://diamantidis.github.io/tips/2020/07/01/list-makefile-targets
 
 .PHONY: clean
 clean:
-	$(RM) -rf coverage
+	$(RM) -rf coverage/
 
 .PHONY: all
 all: lint test run
@@ -25,8 +25,12 @@ run: run.sh ## Runs sample game
 
 .PHONY: lint
 lint: Makefile *.sh ## Lint with shellcheck
-	shellcheck -o all -S style *.sh
+	shellcheck -S warning *.sh
 	checkmake Makefile
+
+.PHONY: pedantic-lint
+pedantic-lint: *.sh ## Lint with shellcheck - pedantic mode
+	shellcheck -o all -S style *.sh
 
 .PHONY: test
 test: *.bats ## Runs all tests
@@ -35,6 +39,7 @@ test: *.bats ## Runs all tests
 .PHONY: coverage
 coverage: *.bats ## Runs tests with coverage
 	kcov --bash-dont-parse-binary-dir --include-path=. coverage bats $^
+	jq -r '.percent_covered' < $$(find coverage -name coverage.json)
 
 .PHONY: time
 time: ## Run sample multiple times and print timings
