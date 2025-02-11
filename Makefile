@@ -25,7 +25,7 @@ run: run.sh ## Runs sample game
 
 .PHONY: lint
 lint: Makefile *.sh ## Lint with shellcheck
-	shellcheck -S warning *.sh
+	shellcheck -S style *.sh
 	checkmake Makefile
 
 .PHONY: pedantic-lint
