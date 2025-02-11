@@ -49,8 +49,8 @@ teardown() {
 @test "print board" {
   set_at 0 0
   set_at 0 1
-  run print_board 5
-  assert_output --partial ' xx '
+  run print_board 2
+  assert_line '  xx '
 }
 
 @test "dump board" {
